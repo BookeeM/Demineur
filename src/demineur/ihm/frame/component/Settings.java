@@ -14,6 +14,13 @@ public class Settings
 		
 	}
 	
+	/** Permet de sauvegarder les options passées en paramètres.
+	 * 
+	 * @param volume
+	 * @param largeur
+	 * @param hauteur
+	 * @param timer
+	 */
 	public static void saveOption(int volume, int largeur, int hauteur,int timer)
 	{
 		Properties p = new Properties();
@@ -36,6 +43,10 @@ public class Settings
 		}
 	}
 	
+	/** Retourne le temps que l'utilisateur a choisi au max pour finir sa partie
+	 * 
+	 * @return int : contrainte de temps
+	 */
 	public static int getTimeConstraint()
 	{
 		int a = 0;
@@ -50,6 +61,10 @@ public class Settings
 		return a;	
 	}
 	
+	/** Retourne le volume que l'utilisateur a choisi
+	 * 
+	 * @return volume : int
+	 */
 	public static int getVolumeOption()
 	{
 		int a = 0;
@@ -64,6 +79,10 @@ public class Settings
 		return a;	
 	}
 	
+	/** Retourne la largeur de la grille que l'utilisateur a choisi
+	 * 
+	 * @return largeur : int
+	 */
 	public static int getLargeurOption()
 	{
 		int a = 0;
@@ -78,6 +97,10 @@ public class Settings
 		return a;	
 	}
 	
+	/** Retourne la hauteur de la grille que l'utilisateur a choisi
+	 * 
+	 * @return hauteur : int
+	 */
 	public static int getHauteurOption()
 	{
 		int a = 0;

@@ -64,6 +64,8 @@ public class FrameJeu extends JFrame implements MouseListener
 	 * @param dif : difficultée choisie au préalable par l'utilisateur.
 	 * @param largeur : largeur choisie au préalable par l'utilisateur.
 	 * @param hauteur : hauteur choisie au préalable par l'utilisateur.
+	 * 
+	 * @author Emilien G
 	 */
 	public FrameJeu(Difficulte dif, int largeur, int hauteur, int timerConstraint)
 	{

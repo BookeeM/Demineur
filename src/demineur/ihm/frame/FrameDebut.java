@@ -31,7 +31,7 @@ import demineur.ihm.Difficulte;
 import demineur.ihm.frame.component.OptionSliders;
 import demineur.ihm.frame.component.Settings;
 
-public class FrameDebut extends JFrame 
+public class FrameDebut extends JFrame implements MouseListener
 {
 	
 	public static final Color DARK6 = new Color(24, 24, 64);
@@ -69,6 +69,7 @@ public class FrameDebut extends JFrame
 	
 	/** Constructeur permettant la création des différentes fenêtre du menu principal
 	 * 
+	 * @author Emilien G
 	 */
 	public FrameDebut()
 	{
@@ -84,65 +85,22 @@ public class FrameDebut extends JFrame
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout(0,0));
 		this.setContentPane(contentPane);
-		
-		this.setPreferredSize(new Dimension(310,400));
-		
-		/* Panel Nord */
-		JPanel nord = new JPanel();
-		nord.setBackground(DARK6);
-		nord.setPreferredSize(new Dimension(600,60));
-		JLabel dem = new JLabel("Jeu du Démineur",JLabel.CENTER);
-		dem.setFont(font);
-		dem.setForeground(Color.WHITE);
-		nord.add(dem);
-		
-		/* Panel West */
-		JPanel west = new JPanel();
-		west.setLayout(new BorderLayout(0,0));
-		
-		BufferedImage img;
 
-			JPanel leftSide = new JPanel();
-			leftSide.setBackground(DARK5);
-			leftSide.setLayout(new GridLayout(3,1));
-			west.add(leftSide);
-	        option = new JLabel("",JLabel.CENTER);
-	        
-	        option.setIcon(this.iconOption);
-	        leftSide.add(option,BorderLayout.NORTH);
-	        
-	        option.addMouseListener(new MouseListener() {
-				@Override
-				public void mousePressed(MouseEvent e) 
-				{
-					option();
-				}
-				
-				@Override
-				public void mouseExited(MouseEvent e) 
-				{
-					option.setIcon(iconOption);
-				}
-				
-				@Override
-				public void mouseEntered(MouseEvent e) 
-				{
-					option.setIcon(iconOptionHover);
-				}
-				
-				@Override
-				public void mouseClicked(MouseEvent e) {}
-				@Override
-				public void mouseReleased(MouseEvent e) {}
-			});
-
-
-	        
-	        
-		west.setBackground(DARK5);
-		west.setPreferredSize(new Dimension(60,600));
+		this.setPreferredSize(new Dimension(295,400));
 		
-		/* Panel Center */
+		initNorth();
+		initCenter();
+		initWest();
+		
+		this.pack();
+	}
+	
+	/** Permet d'initialiser le panneau du centre avec le titre, les difficultés et le bouton pour commencer
+	 * 
+	 */
+	public void initCenter()
+	{
+		/*Initialisation du panel principal*/
 		JPanel center = new JPanel();
 		center.setLayout(new BorderLayout(0,0));
 		center.setBackground(DARK4);
@@ -151,91 +109,116 @@ public class FrameDebut extends JFrame
 		card = new CardLayout();
 		this.centerMenu.setLayout(card);
 		
-			//Center menu
-			menuContent = new JPanel();
-			menuContent.setLayout(new BorderLayout(0,0));
-			
-			this.listModel = new DefaultListModel<String>();
-			ArrayList<String> difs = new ArrayList<String>(Arrays.asList(Difficulte.DEBUTANT.getLabel(),Difficulte.AMATEUR.getLabel(),Difficulte.MOYEN.getLabel(),Difficulte.HABILE.getLabel(),Difficulte.EXPERT.getLabel()));
-			for(String dif : difs ) {
-				this.listModel.addElement(dif);
-			}
-			this.liste     = new JList<String>(listModel);
-			this.liste.setSelectedIndex(0);
-			this.liste.setForeground(Color.WHITE);
-			//this.liste.setBackground( Color.CYAN );
-			this.liste.setFont(this.font);
-			this.liste.setBackground(DARK3);
+		/*Création du menu central, choix des difficultés*/
+		menuContent = new JPanel();
+		menuContent.setLayout(new BorderLayout(0,0));
 		
-			DefaultListCellRenderer renderer =  (DefaultListCellRenderer)liste.getCellRenderer();  
-			renderer.setHorizontalAlignment(JLabel.CENTER);
-			
-			menuContent.add(liste,BorderLayout.CENTER);
-			
-			//Title
-			JTextField title = new JTextField("Choix du Niveau");
+		this.listModel = new DefaultListModel<String>();
+		ArrayList<String> difs = new ArrayList<String>(Arrays.asList(Difficulte.DEBUTANT.getLabel(),Difficulte.AMATEUR.getLabel(),Difficulte.MOYEN.getLabel(),Difficulte.HABILE.getLabel(),Difficulte.EXPERT.getLabel()));
+		for(String dif : difs ) {
+			this.listModel.addElement(dif);
+		}
+		this.liste     = new JList<String>(listModel);
+		this.liste.setSelectedIndex(0);
+		this.liste.setForeground(Color.WHITE);
+		//this.liste.setBackground( Color.CYAN );
+		this.liste.setFont(this.font);
+		this.liste.setBackground(DARK3);
+	
+		DefaultListCellRenderer renderer =  (DefaultListCellRenderer)liste.getCellRenderer();  
+		renderer.setHorizontalAlignment(JLabel.CENTER);
 		
-			title.setEditable(false);
-			title.setForeground(WHITE);
-			title.setBackground(DARK3);
-			title.setBorder(BorderFactory.createEmptyBorder());
-			title.setFont(this.font);
-			menuContent.add(title,BorderLayout.NORTH);
-			
-			//Bouton
-			JButton jouer = new JButton("Jouer !");
-			jouer.setBackground(DARK3B);
-			jouer.setFont(this.font);
-			jouer.setForeground(Color.WHITE);
-			jouer.setBorder(BorderFactory.createRaisedSoftBevelBorder());
-			jouer.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					System.out.println(liste);
-					FrameJeu fj = new FrameJeu((Difficulte) Difficulte.fromString((String)liste.getSelectedValue()),Settings.getHauteurOption(),Settings.getLargeurOption(),Settings.getTimeConstraint());
-					fj.setVisible(true);
-					dispose();
-				}
-			});
-			menuContent.add(jouer,BorderLayout.SOUTH);
-
+		menuContent.add(liste,BorderLayout.CENTER);
+		
+		/*Définition du titre de la section choix du niveau*/
+		JTextField title = new JTextField("Choix du Niveau");
+	
+		title.setEditable(false);
+		title.setForeground(WHITE);
+		title.setBackground(DARK3);
+		title.setBorder(BorderFactory.createEmptyBorder());
+		title.setFont(this.font);
+		menuContent.add(title,BorderLayout.NORTH);
+		
+		/*Positionnement du bouton pour lancer la partie*/
+		
+		JButton jouer = new JButton("Jouer !");
+		jouer.setBackground(DARK3B);
+		jouer.setFont(this.font);
+		jouer.setForeground(Color.WHITE);
+		jouer.setBorder(BorderFactory.createRaisedSoftBevelBorder());
+		jouer.addMouseListener(this);
+		menuContent.add(jouer,BorderLayout.SOUTH);
 		centerMenu.add("1",menuContent);
 		
+		/*Création de la deuxième vue, celle des options*/
+		JSlider[] sliders = new JSlider[3];
 		
-			JSlider[] sliders = new JSlider[3];
-			
-			//Center menu
-			menuOption = new JPanel();
-			menuOption.setLayout(new GridLayout(5,1));
-			menuOption.setBackground(DARK3);
-			JLabel optionTitle = new JLabel("Options",JLabel.CENTER);
-			optionTitle.setForeground(WHITE);
-			optionTitle.setBackground(DARK3);
-			optionTitle.setBorder(BorderFactory.createEmptyBorder());
-			optionTitle.setFont(this.font);
-			menuOption.add(optionTitle);
-			
-			volume = OptionSliders.getVolumeSlider();
-			longueur = OptionSliders.getHauteurSlider();
-			hauteur = OptionSliders.getLargeurSlider();
-			time = OptionSliders.getTimeSlider();
-			
-			menuOption.add(volume);
-			menuOption.add(longueur);
-			menuOption.add(hauteur);
-			menuOption.add(time);
+		//Placement des différentes options et de leurssliders.
+		menuOption = new JPanel();
+		menuOption.setLayout(new GridLayout(5,1));
+		menuOption.setBackground(DARK3);
+		JLabel optionTitle = new JLabel("Options",JLabel.CENTER);
+		optionTitle.setForeground(WHITE);
+		optionTitle.setBackground(DARK3);
+		optionTitle.setBorder(BorderFactory.createEmptyBorder());
+		optionTitle.setFont(this.font);
+		menuOption.add(optionTitle);
+		
+		volume = OptionSliders.getVolumeSlider();
+		longueur = OptionSliders.getHauteurSlider();
+		hauteur = OptionSliders.getLargeurSlider();
+		time = OptionSliders.getTimeSlider();
+		
+		menuOption.add(volume);
+		menuOption.add(longueur);
+		menuOption.add(hauteur);
+		menuOption.add(time);
 			
 			
 		centerMenu.add("2",menuOption);
 		centerMenu.setBackground(DARK3);
 		
 		center.add(centerMenu,BorderLayout.WEST);
-		//------------------
-		
-		contentPane.add(nord,BorderLayout.NORTH);
-		contentPane.add(west,BorderLayout.WEST);
 		contentPane.add(center,BorderLayout.CENTER);
-		this.pack();
+	}
+	
+	/** Initialisation du pannel gauche qui contient l'icone pour les paramètres.
+	 * 
+	 */
+	public void initWest()
+	{
+		JPanel west = new JPanel();
+		west.setLayout(new BorderLayout(0,0));
+		BufferedImage img;
+		/*Placement du logo des paramètres*/
+		JPanel leftSide = new JPanel();
+		leftSide.setBackground(DARK5);
+		leftSide.setLayout(new GridLayout(3,1));
+		west.add(leftSide);
+        option = new JLabel("",JLabel.CENTER);
+        
+        option.setIcon(this.iconOption);
+        leftSide.add(option,BorderLayout.NORTH);
+        
+        option.addMouseListener(this);
+        
+		west.setBackground(DARK5);
+		west.setPreferredSize(new Dimension(60,600));
+		contentPane.add(west,BorderLayout.WEST);
+	}
+	
+	/*Initialisation du panel nord qui affiche le titre*/
+	public void initNorth()
+	{
+		JPanel nord = new JPanel();
+		nord.setBackground(DARK6);
+		nord.setPreferredSize(new Dimension(600,60));
+		JLabel dem = new JLabel("Jeu du Démineur",JLabel.CENTER);
+		dem.setFont(font);
+		dem.setForeground(Color.WHITE);
+		nord.add(dem);
+		contentPane.add(nord,BorderLayout.NORTH);
 	}
 	
 	/** Permet de passer dans les options / retourner sur la vue menu
@@ -259,5 +242,48 @@ public class FrameDebut extends JFrame
 		}
 		card.next(this.centerMenu);
 		this.isInOption = !this.isInOption;
+	}
+	
+	/** Ici j'entreprends que peu de rigueur sur l'analyse des sources, mais cela n'est pas forcément obligatoire étant donné qu'on a que deux élements différents qui
+	 * ont besoin d'un listener, un bouton et un label, on fera la différence en fonction de leur objet ici.
+	 * */
+	@Override
+	public void mousePressed(MouseEvent e) 
+	{
+		if(e.getSource() instanceof JLabel) {
+			option();
+		} else if(e.getSource() instanceof JButton) {
+			System.out.println(liste);
+			FrameJeu fj = new FrameJeu((Difficulte) Difficulte.fromString((String)liste.getSelectedValue()),Settings.getHauteurOption(),Settings.getLargeurOption(),Settings.getTimeConstraint());
+			fj.setVisible(true);
+			dispose();
+		}	
+	}
+	
+	@Override
+	public void mouseExited(MouseEvent e) 
+	{
+		if(e.getSource() instanceof JLabel)
+			option.setIcon(iconOption);
+	}
+	
+	@Override
+	public void mouseEntered(MouseEvent e) 
+	{
+		if(e.getSource() instanceof JLabel)
+			option.setIcon(iconOptionHover);
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
