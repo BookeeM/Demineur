@@ -1,12 +1,14 @@
 package demineur.utils;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.UUID;
 
 import org.simpleyaml.configuration.file.YamlFile;
 import org.simpleyaml.exceptions.InvalidConfigurationException;
@@ -24,14 +26,21 @@ public class Settings
 	 * 
 	 * @param score : score à stocker
 	 */
+	
+	private static ArrayList<Score> scores;
+	
 	public static void saveScore(Score score)
 	{
 		//On ne va stocker les scores que s'il sont positifs, donc que lorsque que l'on a gagné + sans triche.
 		
 		if(score.getScore() > 0)
 		{
-			final YamlFile save = new YamlFile("src/demineur/assets/saves/scores.yaml");
+			final YamlFile save = new YamlFile("scores.yaml");
+
 			try {
+	            if (!save.exists()) {
+	                save.createNewFile(true);
+	            }
 				save.load();
 			} catch (InvalidConfigurationException e) {
 				e.printStackTrace();
@@ -39,7 +48,7 @@ public class Settings
 				e.printStackTrace();
 			}
 			
-			ArrayList<Score> scores = insertScore(score, save);
+			insertScore(score, save);
 			writeScore(scores,save);
 		}		
 		//System.out.println(readScore(1).getScore()+" "+readScore(1).getTemps()+" "+readScore(1).getDif());
@@ -78,13 +87,43 @@ public class Settings
 	 * @param save
 	 * @return scores
 	 */
-	public static ArrayList<Score> insertScore(Score score, YamlFile save)
+	public static void insertScore(Score score, YamlFile save)
 	{
-		ArrayList<Score> scores = getScores(save);
+		
+		scores = getScores();
 		scores.add(score);
 		Collections.sort(scores);  
+	}
+	
+	/**
+	 *  Retourne la position d'un score dans le classement
+	 * @param score
+	 * @return position : int
+	 */
+	public static int getPos(Score score)
+	{
+		int pos = 1;
+		
+		final YamlFile save = new YamlFile("scores.yaml");
 
-		return scores;
+		try {
+			save.load();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		for(Score s : getScores())
+		{	
+			if(score != s) {
+				pos++;
+			} else {
+				return pos;
+			}
+		}
+		return pos;
 	}
 	
 	/**
@@ -92,9 +131,9 @@ public class Settings
 	 * @param save
 	 * @return
 	 */
-	public static ArrayList<Score> getScores(YamlFile save)
+	public static ArrayList<Score> initScores(YamlFile save)
 	{
-		ArrayList<Score> scores = new ArrayList<Score>();
+		scores = new ArrayList<Score>();
 		
 		try {
 			save.load();
@@ -111,6 +150,11 @@ public class Settings
 			Score score = new Score(oldScore,oldTemps,oldDif);
 			scores.add(score);
 		}
+		return scores;
+	}
+	
+	public static ArrayList<Score> getScores()
+	{
 		return scores;
 	}
 	
@@ -154,13 +198,12 @@ public class Settings
 		p.setProperty("timeConstraint", Integer.toString(timer));
 		
 		FileWriter fw;
-		
 		try {
-			fw = new FileWriter(new File(Settings.class.getResource("/demineur/assets/saves/options.txt").toURI()));
+			FileOutputStream out = new FileOutputStream("options.txt");	
 		
-			p.store(fw, "Options");
-			fw.flush();
-			fw.close();
+			p.store(out, "Options");
+			out.flush();
+			out.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -176,8 +219,8 @@ public class Settings
 		int a = 0;
 		try {
 			Properties p = new Properties();
-			FileReader fr = new FileReader(new File(Settings.class.getResource("/demineur/assets/saves/options.txt").toURI()));
-			p.load(fr);
+			InputStream in = new FileInputStream("options.txt");
+			p.load(in);
 		    a = Integer.parseInt(p.getProperty("timeConstraint"));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -194,8 +237,8 @@ public class Settings
 		int a = 0;
 		try {
 			Properties p = new Properties();
-			FileReader fr = new FileReader(new File(Settings.class.getResource("/demineur/assets/saves/options.txt").toURI()));
-			p.load(fr);
+			InputStream in = new FileInputStream("options.txt");
+			p.load(in);
 		    a = Integer.parseInt(p.getProperty("volume"));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -212,8 +255,8 @@ public class Settings
 		int a = 0;
 		try {
 			Properties p = new Properties();
-			FileReader fr = new FileReader(new File(Settings.class.getResource("/demineur/assets/saves/options.txt").toURI()));
-			p.load(fr);
+			InputStream in = new FileInputStream("options.txt");
+			p.load(in);
 		    a = Integer.parseInt(p.getProperty("largeur"));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -230,8 +273,8 @@ public class Settings
 		int a = 0;
 		try {
 			Properties p = new Properties();
-			FileReader fr = new FileReader(new File(Settings.class.getResource("/demineur/assets/saves/options.txt").toURI()));
-			p.load(fr);
+			InputStream in = new FileInputStream("options.txt");
+			p.load(in);
 		    a = Integer.parseInt(p.getProperty("hauteur"));
 		} catch (Exception e) {
 			e.printStackTrace();

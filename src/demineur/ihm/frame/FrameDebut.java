@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,11 +22,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+
+import org.simpleyaml.configuration.file.YamlFile;
+import org.simpleyaml.exceptions.InvalidConfigurationException;
 
 import demineur.ihm.Difficulte;
 import demineur.utils.OptionSliders;
+import demineur.utils.Score;
 import demineur.utils.Settings;
 
 @SuppressWarnings("serial")
@@ -42,6 +49,7 @@ public class FrameDebut extends JFrame implements MouseListener
 	public static final Color WHITE = new Color(190,190,190);
 	
 	private boolean isInOption;
+	private boolean isInBestScore;
 
 	private JSlider volume;
 	private JSlider longueur;
@@ -52,17 +60,28 @@ public class FrameDebut extends JFrame implements MouseListener
 	
 	private Icon iconOptionHover = new ImageIcon(FrameDebut.class.getResource("/demineur/assets/img/options2.png"));
 	private Icon iconOption = new ImageIcon(FrameDebut.class.getResource("/demineur/assets/img/options.png"));
+	
+	private Icon iconBestScoreHover = new ImageIcon(FrameDebut.class.getResource("/demineur/assets/img/bestscore2.png"));
+	private Icon iconBestScore = new ImageIcon(FrameDebut.class.getResource("/demineur/assets/img/bestscore.png"));
+	
 	private JLabel option;
 	
 	private JPanel centerMenu;
 	private JPanel menuOption;
 	private JPanel menuContent;
+	private JPanel menuScore;
+	
+	private JList<String> scoreList;
+	private DefaultListModel<String> scoreModel;
+	
+	private JLabel bestScore;
 	
 	private DefaultListModel<String> listModel ;
 	private JList<String>            liste ;
 	private JPanel contentPane;
 	
 	public static Font font;
+	public static Font fontSmaller;
 	
 	
 	/** Constructeur permettant la création des différentes fenêtre du menu principal
@@ -75,10 +94,20 @@ public class FrameDebut extends JFrame implements MouseListener
 		this.setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
+		//Initialisation + création du fichier de paramètre basique.
+		try {
+			Settings.saveOption(Settings.getVolumeOption(),Settings.getLargeurOption(),Settings.getHauteurOption(),0);
+		} catch(Exception e) {
+			Settings.saveOption(20, 11, 11,0);
+		}
 		this.isInOption = false;
+		this.isInBestScore = false;
 		
 		FrameDebut.font = new Font(Font.SANS_SERIF, 15, 100);
 		FrameDebut.font = FrameDebut.font.deriveFont(30f);
+		
+		FrameDebut.fontSmaller = new Font(Font.SANS_SERIF, 15, 100);
+		FrameDebut.fontSmaller = FrameDebut.font.deriveFont(25f);
 		
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout(0,0));
@@ -183,9 +212,65 @@ public class FrameDebut extends JFrame implements MouseListener
 		centerMenu.add("2",menuOption);
 		centerMenu.setBackground(DARK3);
 		
+		/*Création du menu Best Score*/
+		
+		this.menuScore = new JPanel();
+		this.menuScore.setLayout(new BorderLayout(0,0));
+		
+		JLabel bestTitle = new JLabel("Meilleurs Scores",JLabel.CENTER);
+		menuScore.add(bestTitle,BorderLayout.NORTH);
+		bestTitle.setFont(fontSmaller);
+		bestTitle.setForeground(WHITE);
+		
+	    JScrollPane scrollPane = new JScrollPane(menuScore,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	    scrollPane.setPreferredSize(new Dimension(200, 390));
+		
+		final YamlFile save = new YamlFile("scores.yaml");
+
+		try {
+            if (!save.exists()) {
+                save.createNewFile(true);
+            }
+			save.load();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		this.scoreModel = new DefaultListModel<String>();
+		
+		this.scoreList     = new JList<String>(scoreModel);
+		this.scoreList.setPreferredSize(new Dimension(200,390));
+		this.scoreList.setSelectedIndex(0);
+		this.scoreList.setForeground(Color.WHITE);
+		//this.liste.setBackground( Color.CYAN );
+		this.scoreList.setFont(FrameDebut.font);
+		this.scoreList.setBackground(DARK3);
+
+		menuScore.add(scoreList,BorderLayout.CENTER);
+		
+		centerMenu.add("3",scrollPane);
+		menuScore.setBackground(DARK3);
+		
+		
+		
+		
 		center.add(centerMenu,BorderLayout.WEST);
 		contentPane.add(center,BorderLayout.CENTER);
 	}
+	
+	public void updateScores()
+	{
+		this.scoreModel.clear();
+		ArrayList<Score> scores = Settings.getScores();
+		
+		for(int i=0;i<scores.size();i++) {
+			this.scoreModel.addElement(scores.get(i).toString());
+		}
+		
+	}
+	
 	
 	/** Initialisation du pannel gauche qui contient l'icone pour les paramètres.
 	 * 
@@ -193,21 +278,41 @@ public class FrameDebut extends JFrame implements MouseListener
 	public void initWest()
 	{
 		JPanel west = new JPanel();
-		west.setLayout(new BorderLayout(0,0));
+		west.setLayout(new GridLayout(3,1));
 		/*Placement du logo des paramètres*/
+		
 		JPanel leftSide = new JPanel();
 		leftSide.setBackground(DARK5);
 		leftSide.setLayout(new GridLayout(3,1));
-		west.add(leftSide);
+		
         option = new JLabel("",JLabel.CENTER);
+		option.addMouseListener(this);
+		option.setIcon(this.iconOption);
+		
+		leftSide.add(option);
+        //----------------------
+        /*Placement du logo meilleur score*/
+
+		JPanel best = new JPanel();
+		best.setBackground(DARK5);
+
+        bestScore = new JLabel("",JLabel.CENTER);
+        bestScore.addMouseListener(this);
+        bestScore.setIcon(this.iconBestScore);
         
-        option.setIcon(this.iconOption);
-        leftSide.add(option,BorderLayout.NORTH);
+        bestScore.setVerticalAlignment(JLabel.CENTER);
         
-        option.addMouseListener(this);
+   
         
+        best.add(bestScore);
+        //-----------------
+
 		west.setBackground(DARK5);
 		west.setPreferredSize(new Dimension(60,600));
+		
+		west.add(leftSide,BorderLayout.NORTH);
+		west.add(best,BorderLayout.CENTER);
+		
 		contentPane.add(west,BorderLayout.WEST);
 	}
 	
@@ -230,10 +335,18 @@ public class FrameDebut extends JFrame implements MouseListener
 	 */
 	public void option()
 	{
+		
+		if(this.isInBestScore) {
+			card.next(this.centerMenu);
+			this.isInBestScore = false;
+		}
+		
 		if(this.isInOption)
 		{
 			Settings.saveOption(this.volume.getValue(), this.longueur.getValue(), this.hauteur.getValue(),this.time.getValue());
+			card.first(this.centerMenu);
 		} else {
+			card.next(this.centerMenu);
 			try {
 				this.volume.setValue(Settings.getVolumeOption());
 				this.longueur.setValue(Settings.getLargeurOption());
@@ -243,18 +356,35 @@ public class FrameDebut extends JFrame implements MouseListener
 				e.printStackTrace();
 			}
 		}
-		card.next(this.centerMenu);
+			
 		this.isInOption = !this.isInOption;
 	}
 	
-	/** Ici j'entreprends que peu de rigueur sur l'analyse des sources, mais cela n'est pas forcément obligatoire étant donné qu'on a que deux élements différents qui
-	 * ont besoin d'un listener, un bouton et un label, on fera la différence en fonction de leur objet ici.
-	 * */
+	public void bestScore()
+	{
+		updateScores();
+		if(this.isInOption) {
+			card.last(this.centerMenu);
+			this.isInOption = false;
+		}
+		
+		if(this.isInBestScore)
+		{
+			card.first(this.centerMenu);
+		} else {
+			card.last(this.centerMenu);
+		}
+		this.isInBestScore = !this.isInBestScore;
+	}
+	
 	@Override
 	public void mousePressed(MouseEvent e) 
 	{
 		if(e.getSource() instanceof JLabel) {
-			option();
+			if(e.getSource() == bestScore)
+				bestScore();
+			if(e.getSource() == option)
+				option();
 		} else if(e.getSource() instanceof JButton) {
 			System.out.println(liste);
 			FrameJeu fj = new FrameJeu((Difficulte) Difficulte.fromString((String)liste.getSelectedValue()),Settings.getHauteurOption(),Settings.getLargeurOption(),Settings.getTimeConstraint());
@@ -266,15 +396,20 @@ public class FrameDebut extends JFrame implements MouseListener
 	@Override
 	public void mouseExited(MouseEvent e) 
 	{
-		if(e.getSource() instanceof JLabel)
+		if(e.getSource() == option)
 			option.setIcon(iconOption);
+		if(e.getSource() == bestScore)
+			bestScore.setIcon(iconBestScore);
+		
 	}
 	
 	@Override
 	public void mouseEntered(MouseEvent e) 
 	{
-		if(e.getSource() instanceof JLabel)
+		if(e.getSource() == option)
 			option.setIcon(iconOptionHover);
+		if(e.getSource() == bestScore)
+			bestScore.setIcon(iconBestScoreHover);
 	}
 	
 	@Override

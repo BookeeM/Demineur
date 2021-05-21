@@ -1,5 +1,9 @@
 package demineur.utils;
 
+import java.util.UUID;
+
+import org.simpleyaml.configuration.file.YamlFile;
+
 import demineur.ihm.Difficulte;
 /**
  * @author Emilien G
@@ -17,6 +21,7 @@ public class Score implements Comparable<Score>
 		this.temps = temps;
 		this.dif = dif;
 	}
+	
 	
 	/** Retourne le score associé à l'objet Score
 	 * 
@@ -53,5 +58,20 @@ public class Score implements Comparable<Score>
 		if(getScore() < i.getScore()) return -1;
 		if(getScore() > i.getScore()) return 1;
 		return 0;
+	}
+	
+	/** retourne le score sous forme à être affiché dans un menu
+	 * @return String : score
+	 */
+	public String toString()
+	{
+		YamlFile save = new YamlFile("scores.yaml");
+		try {
+			save.load();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String build = Integer.toString(Settings.getPos(this))+":"+" "+Integer.toString(getScore())+"pts";
+		return build;
 	}
 }

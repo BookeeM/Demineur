@@ -1,6 +1,0 @@
-#Options
-#Fri May 21 01:30:01 CEST 2021
-volume=59
-largeur=12
-timeConstraint=66
-hauteur=11

@@ -8,7 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -131,9 +134,9 @@ public class FrameJeu extends JFrame implements MouseListener
 		infoTab.setBackground(FrameDebut.DARK3);
 		
 		JLabel infoNbMineDepart = new JLabel("Mines au départ : "+this.demineur.getNbMinesATrouver(),JLabel.CENTER);
-		infoNbMines = new JLabel("Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()),JLabel.CENTER);
-		infoNbCoups = new JLabel("Nombre de Coups Joués : "+0,JLabel.CENTER);
-		timerLabel = new JLabel("Timer : "+0+"s",JLabel.CENTER);
+		infoNbMines = new JLabel("| Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()),JLabel.CENTER);
+		infoNbCoups = new JLabel("| Nombre de Coups Joués : "+0,JLabel.CENTER);
+		timerLabel = new JLabel("| Timer : "+0+"s",JLabel.CENTER);
 		timeAtStart = System.currentTimeMillis();
 		
 		infoNbMineDepart.setForeground(FrameDebut.WHITE);
@@ -147,7 +150,7 @@ public class FrameJeu extends JFrame implements MouseListener
 			{
 				String show = ((System.currentTimeMillis()-timeAtStart)/1000L)+" / "+timerConstraint;
 				//show = show.substring(0, 3); //Pour pas avoir 300000 de numéros parasites
-				timerLabel.setText("Timer : "+show+"s");
+				timerLabel.setText("| Timer : "+show+"s");
 				
 				float t = (System.currentTimeMillis()-timeAtStart)/1000L;
 				
@@ -276,8 +279,8 @@ public class FrameJeu extends JFrame implements MouseListener
 			scoreMultiplier = 0;
 		}
 		
-		infoNbMines.setText("Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()));
-		infoNbCoups.setText("Nombre de Coups Joués : "+nbCoups);
+		infoNbMines.setText("| Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()));
+		infoNbCoups.setText("| Nombre de Coups Joués : "+nbCoups);
 	}
 
 	
@@ -393,10 +396,15 @@ public class FrameJeu extends JFrame implements MouseListener
 	 */
 	public void playSound(String fileName) 
 	{	
-		try {
-			AudioInputStream audioIn = AudioSystem.getAudioInputStream(FrameJeu.class.getResourceAsStream("/demineur/assets/sounds/"+fileName+".wav"));
+		try {	
+			InputStream audioSrc = FrameJeu.class.getResourceAsStream("/demineur/assets/sounds/"+fileName+".wav");
+			InputStream bufferedIn = new BufferedInputStream(audioSrc);
+			
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+			
+			
 			Clip clip = AudioSystem.getClip();    
-		    clip.open(audioIn);
+		    clip.open(audioStream);
 		    
 		    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
 		    gainControl.setValue(20f * (float) Math.log10(Settings.getVolumeOption()/100f));
