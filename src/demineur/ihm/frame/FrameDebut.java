@@ -92,7 +92,7 @@ public class FrameDebut extends JFrame implements MouseListener
 	{
 		super("Démineur - Menu");
 		this.setResizable(false);
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		
 		//Initialisation + création du fichier de paramètre basique.
 		try {

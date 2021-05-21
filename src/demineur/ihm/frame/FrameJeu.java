@@ -94,7 +94,7 @@ public class FrameJeu extends JFrame implements MouseListener
 		
 		this.timerConstraint = timerConstraint;
 		
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		
 		this.nbCoups = 0;
 		
@@ -353,7 +353,9 @@ public class FrameJeu extends JFrame implements MouseListener
 							while(!this.demineur.retourner(but.getId()))
 							{
 								this.demineur = new Demineur(largeur, hauteur, dif.getLvl());
+								
 							}
+							this.nbCoups--;
 							updateListeMine();
 						}
 					}

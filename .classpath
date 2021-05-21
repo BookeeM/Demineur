@@ -6,5 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/Library/Documents/workspaces/Wspace_IHM/Demineur/Simple-Yaml-1.7.2 (1).jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
