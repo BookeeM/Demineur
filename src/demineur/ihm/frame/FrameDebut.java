@@ -64,7 +64,7 @@ public class FrameDebut extends JFrame implements MouseListener
 	private JList<String>            liste ;
 	private JPanel contentPane;
 	
-	private Font font;
+	public static Font font;
 	
 	
 	/** Constructeur permettant la création des différentes fenêtre du menu principal
