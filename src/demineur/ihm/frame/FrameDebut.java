@@ -6,11 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -31,6 +28,7 @@ import demineur.ihm.Difficulte;
 import demineur.ihm.frame.component.OptionSliders;
 import demineur.ihm.frame.component.Settings;
 
+@SuppressWarnings("serial")
 public class FrameDebut extends JFrame implements MouseListener
 {
 	
@@ -79,8 +77,8 @@ public class FrameDebut extends JFrame implements MouseListener
 		
 		this.isInOption = false;
 		
-		this.font = new Font(Font.SANS_SERIF, 15, 100);
-		this.font = this.font.deriveFont(30f);
+		FrameDebut.font = new Font(Font.SANS_SERIF, 15, 100);
+		FrameDebut.font = FrameDebut.font.deriveFont(30f);
 		
 		contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout(0,0));
@@ -122,7 +120,7 @@ public class FrameDebut extends JFrame implements MouseListener
 		this.liste.setSelectedIndex(0);
 		this.liste.setForeground(Color.WHITE);
 		//this.liste.setBackground( Color.CYAN );
-		this.liste.setFont(this.font);
+		this.liste.setFont(FrameDebut.font);
 		this.liste.setBackground(DARK3);
 	
 		DefaultListCellRenderer renderer =  (DefaultListCellRenderer)liste.getCellRenderer();  
@@ -137,22 +135,19 @@ public class FrameDebut extends JFrame implements MouseListener
 		title.setForeground(WHITE);
 		title.setBackground(DARK3);
 		title.setBorder(BorderFactory.createEmptyBorder());
-		title.setFont(this.font);
+		title.setFont(FrameDebut.font);
 		menuContent.add(title,BorderLayout.NORTH);
 		
 		/*Positionnement du bouton pour lancer la partie*/
 		
 		JButton jouer = new JButton("Jouer !");
 		jouer.setBackground(DARK3B);
-		jouer.setFont(this.font);
+		jouer.setFont(FrameDebut.font);
 		jouer.setForeground(Color.WHITE);
 		jouer.setBorder(BorderFactory.createRaisedSoftBevelBorder());
 		jouer.addMouseListener(this);
 		menuContent.add(jouer,BorderLayout.SOUTH);
 		centerMenu.add("1",menuContent);
-		
-		/*Création de la deuxième vue, celle des options*/
-		JSlider[] sliders = new JSlider[3];
 		
 		//Placement des différentes options et de leurssliders.
 		menuOption = new JPanel();
@@ -162,7 +157,7 @@ public class FrameDebut extends JFrame implements MouseListener
 		optionTitle.setForeground(WHITE);
 		optionTitle.setBackground(DARK3);
 		optionTitle.setBorder(BorderFactory.createEmptyBorder());
-		optionTitle.setFont(this.font);
+		optionTitle.setFont(FrameDebut.font);
 		menuOption.add(optionTitle);
 		
 		volume = OptionSliders.getVolumeSlider();
@@ -170,11 +165,20 @@ public class FrameDebut extends JFrame implements MouseListener
 		hauteur = OptionSliders.getLargeurSlider();
 		time = OptionSliders.getTimeSlider();
 		
+		try {
+			this.volume.setValue(Settings.getVolumeOption());
+			this.longueur.setValue(Settings.getLargeurOption());
+			this.hauteur.setValue(Settings.getHauteurOption());
+			this.time.setValue(Settings.getTimeConstraint());
+			
+		} catch(Exception e) {
+			Settings.saveOption(20, 11, 11, 0);
+		}
+
 		menuOption.add(volume);
 		menuOption.add(longueur);
 		menuOption.add(hauteur);
 		menuOption.add(time);
-			
 			
 		centerMenu.add("2",menuOption);
 		centerMenu.setBackground(DARK3);
@@ -190,7 +194,6 @@ public class FrameDebut extends JFrame implements MouseListener
 	{
 		JPanel west = new JPanel();
 		west.setLayout(new BorderLayout(0,0));
-		BufferedImage img;
 		/*Placement du logo des paramètres*/
 		JPanel leftSide = new JPanel();
 		leftSide.setBackground(DARK5);

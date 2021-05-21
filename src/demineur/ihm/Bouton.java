@@ -12,8 +12,6 @@ public class Bouton
 	private int id;
 	private JButton button;
 	
-	private boolean ouvert;
-	
 	
 	/** Constructeur permettant la création d'un objet bouton 
 	 * 
@@ -24,7 +22,6 @@ public class Bouton
 	{
 		this.id = id;
 		this.button = button;
-		this.ouvert = false;
 	}
 	
 	/** Retourne l'id d'un bouton, donc la position dans le tableau de boutons de la classe FrameJeu

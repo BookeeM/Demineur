@@ -1,6 +1,7 @@
 package demineur.ihm.frame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,9 +9,10 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
+@SuppressWarnings("serial")
 public class FrameFin extends JFrame
 {
 	
@@ -27,18 +29,18 @@ public class FrameFin extends JFrame
 	{
 		super("Démineur - Fin de Partie");
 		this.setResizable(false);
-		this.setPreferredSize(new Dimension(550,250));
+		this.setPreferredSize(new Dimension(450,180));
 		frame = this;
 		
 		
 		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		
-		String text;
+		JLabel fin;
 		if(hasWin)
 		{
-			text = "Félicitations, vous avez gagné avec un score de : "+score+" en "+temps+"s";
+			fin = new JLabel("<html><div style='text-align: center;'>"+"Félicitations,vous avez gagné <br/>"+"avec un score de "+score+" en "+temps+"s"+"</div></html>");
 		} else {
-			text = "Dommage, vous ferez mieux la prochaine fois, votre temps : "+temps+"s";
+			fin = new JLabel("<html><div style='text-align: center;'>"+"Dommage,vous avez perdu <br/>"+"avec un score de "+score+" en "+temps+"s"+"</div></html>");
 		}
 		
 		JPanel contentPane = new JPanel();
@@ -46,20 +48,36 @@ public class FrameFin extends JFrame
 		contentPane.setBackground(FrameDebut.DARK3);
 		this.setContentPane(contentPane);
 		
-		JTextArea fin = new JTextArea(text);
+		
+		fin.setHorizontalAlignment(JLabel.CENTER);
+		fin.setSize(50, 50);
 		
 		fin.setFont(FrameDebut.font);
-		fin.setEditable(false);
-		fin.setForeground(FrameDebut.WHITE);
+		fin.setForeground(Color.WHITE);
 		fin.setBackground(FrameDebut.DARK3);
 		fin.setBorder(BorderFactory.createEmptyBorder());
-
 		
 		JPanel buttons = new JPanel();
-		JButton retourMenu = new JButton("Menu");
-		retourMenu.setFont(FrameDebut.font);
-		JButton quitter = new JButton("Quitter");
-		quitter.setFont(FrameDebut.font);
+		buttons.setBackground(FrameDebut.DARK5);
+		
+		JButton retourMenu = new JButton();
+		JLabel r = new JLabel("     Menu",JLabel.CENTER);
+		retourMenu.add(r);
+		retourMenu.setBackground(FrameDebut.DARK3);
+		r.setForeground(FrameDebut.WHITE);
+		retourMenu.setPreferredSize(new Dimension(150,50));
+		r.setFont(FrameDebut.font);
+		retourMenu.setBorder(BorderFactory.createEtchedBorder());
+		
+		JButton quitter = new JButton("");
+		JLabel q = new JLabel("   Quitter",JLabel.CENTER);
+		quitter.add(q);
+		quitter.setBackground(FrameDebut.DARK3);
+		q.setForeground(FrameDebut.WHITE);
+		q.setPreferredSize(new Dimension(150,50));
+		quitter.setPreferredSize(new Dimension(150,50));
+		q.setFont(FrameDebut.font);
+		quitter.setBorder(BorderFactory.createEtchedBorder());
 		
 		retourMenu.addActionListener(new ActionListener() {
 			@Override

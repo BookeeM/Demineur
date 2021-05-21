@@ -14,6 +14,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +25,9 @@ import demineur.ihm.Bouton;
 import demineur.ihm.Difficulte;
 import demineur.ihm.frame.component.Settings;
 import demineur.metier.Demineur;
+import demineur.metier.EtatCase;
 
+@SuppressWarnings("serial")
 public class FrameJeu extends JFrame implements MouseListener
 {
 	
@@ -44,11 +47,17 @@ public class FrameJeu extends JFrame implements MouseListener
 	private JLabel infoNbMines;
 	private JLabel infoNbCoups;
 	
+	private JPanel cheatPanel;
+	
 	private Long timeAtStart;
 	
 	private Timer timer;
 	
 	private JLabel timerLabel;	
+	
+	private int scoreMultiplier;
+	
+	private boolean isCheating;
 	
 	private Bouton[] bouton;
 	
@@ -70,6 +79,11 @@ public class FrameJeu extends JFrame implements MouseListener
 	public FrameJeu(Difficulte dif, int largeur, int hauteur, int timerConstraint)
 	{
 		super("Démineur - Jeu");
+		
+		
+		this.scoreMultiplier = 1;
+		
+		this.isCheating = false;
 		
 		this.timerConstraint = timerConstraint;
 		
@@ -93,6 +107,7 @@ public class FrameJeu extends JFrame implements MouseListener
 		
 		initInfo();
 		initGrid();
+		initCheat();
 		updateListeMine();
 		
 		//contentPane.add();
@@ -109,11 +124,18 @@ public class FrameJeu extends JFrame implements MouseListener
 		infoTab.setLayout(new GridLayout(1,4));
 		infoTab.setPreferredSize(new Dimension(largeur*60,50));
 		
+		infoTab.setBackground(FrameDebut.DARK3);
+		
 		JLabel infoNbMineDepart = new JLabel("Mines au départ : "+this.demineur.getNbMinesATrouver(),JLabel.CENTER);
 		infoNbMines = new JLabel("Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()),JLabel.CENTER);
 		infoNbCoups = new JLabel("Nombre de Coups Joués : "+0,JLabel.CENTER);
 		timerLabel = new JLabel("Timer : "+0+"s",JLabel.CENTER);
 		timeAtStart = System.currentTimeMillis();
+		
+		infoNbMineDepart.setForeground(FrameDebut.WHITE);
+		infoNbMines.setForeground(FrameDebut.WHITE);
+		infoNbCoups.setForeground(FrameDebut.WHITE);
+		timerLabel.setForeground(FrameDebut.WHITE);
 		
 		timer = new Timer(100,new ActionListener() {
 			@Override
@@ -195,6 +217,38 @@ public class FrameJeu extends JFrame implements MouseListener
 		update();
 	}
 	
+	public void initCheat()
+	{
+		cheatPanel = new JPanel();
+		
+		cheatPanel.setBackground(FrameDebut.DARK3);
+		
+		cheatPanel.setPreferredSize(new Dimension(0,60));
+		
+		JButton cheater = new JButton();
+		JLabel t = new JLabel("   Tricher");
+		cheater.add(t);
+		cheater.setBackground(FrameDebut.DARK4);
+		t.setForeground(FrameDebut.WHITE);
+		cheater.setPreferredSize(new Dimension(150,50));
+		cheater.setPreferredSize(new Dimension(150,50));
+		t.setFont(FrameDebut.font);
+		cheater.setBorder(BorderFactory.createEtchedBorder());
+		
+		cheatPanel.add(cheater);
+		
+		cheater.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				isCheating = !isCheating;
+				update();
+			}
+		});
+		
+		this.contentPane.add(cheatPanel,BorderLayout.SOUTH);
+	}
+	
 	
 	/** Mets à jour les cases et les informations de jeu
 	 * 
@@ -204,6 +258,15 @@ public class FrameJeu extends JFrame implements MouseListener
 		for(int i=0;i<largeur*hauteur;i++)
 		{
 			this.bouton[i].update(this.demineur.getEtat(i), this.demineur.getValeur(i));
+		}
+		
+		if(this.isCheating)
+		{
+			for(Bouton mine : listeMines)
+			{
+				mine.getBut().setBackground(Color.RED);
+			}
+			scoreMultiplier = 0;
 		}
 		
 		infoNbMines.setText("Nombre actuel de mines : "+(this.demineur.getNbMinesATrouver()-this.demineur.getNbMinesProposees()));
@@ -249,7 +312,7 @@ public class FrameJeu extends JFrame implements MouseListener
 		if(hasWin)
 		{
 			playSound("win");
-			score = (int) (this.listeMines.size()*10000-(nbCoups*((System.currentTimeMillis()-timeAtStart)/1000L))+(360-timerConstraint)*20);
+			score = (int) ((this.listeMines.size()*10000-(nbCoups*((System.currentTimeMillis()-timeAtStart)/1000L))+(360-timerConstraint)*20)*scoreMultiplier);
 		} else {
 			playSound("loose");
 		}
@@ -267,6 +330,7 @@ public class FrameJeu extends JFrame implements MouseListener
 			{
 				JButton button = (JButton) e.getSource();
 				Bouton but = getBoutonFromButton(button);
+				EtatCase etat = demineur.getEtat(but.getId());
 				
 				if(e.getButton() == 1)
 				{
@@ -281,7 +345,8 @@ public class FrameJeu extends JFrame implements MouseListener
 							updateListeMine();
 						}
 					}
-					nbCoups++;
+					if(etat == EtatCase.FERME)
+						nbCoups++;
 				} else if(e.getButton() == 3) {
 					playSound("flag1");
 					this.demineur.marquer(but.getId());
