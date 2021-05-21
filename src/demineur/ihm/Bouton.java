@@ -7,6 +7,9 @@ import javax.swing.JButton;
 
 import demineur.metier.EtatCase;
 
+/**
+ * @author Emilien G
+ */
 public class Bouton 
 {
 	private int id;

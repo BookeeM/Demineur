@@ -1,5 +1,8 @@
 package demineur.ihm;
 
+/**
+ * @author Emilien G
+ */
 public enum Difficulte 
 {
 	DEBUTANT("DÉBUTANT",1),

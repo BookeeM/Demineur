@@ -4,6 +4,9 @@ import java.awt.Font;
 
 import demineur.ihm.frame.FrameDebut;
 
+/**
+ * @author Emilien G
+ */
 public class Main
 {
 

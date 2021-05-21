@@ -25,8 +25,8 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import demineur.ihm.Difficulte;
-import demineur.ihm.frame.component.OptionSliders;
-import demineur.ihm.frame.component.Settings;
+import demineur.utils.OptionSliders;
+import demineur.utils.Settings;
 
 @SuppressWarnings("serial")
 public class FrameDebut extends JFrame implements MouseListener

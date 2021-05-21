@@ -23,10 +23,14 @@ import javax.swing.Timer;
 
 import demineur.ihm.Bouton;
 import demineur.ihm.Difficulte;
-import demineur.ihm.frame.component.Settings;
 import demineur.metier.Demineur;
 import demineur.metier.EtatCase;
+import demineur.utils.Score;
+import demineur.utils.Settings;
 
+/**
+ * @author Emilien G
+ */
 @SuppressWarnings("serial")
 public class FrameJeu extends JFrame implements MouseListener
 {
@@ -217,6 +221,9 @@ public class FrameJeu extends JFrame implements MouseListener
 		update();
 	}
 	
+	/** Permet de créer le bouton permettant de tricher
+	 *  Attention ! La triche mettra le score à 0...
+	 */
 	public void initCheat()
 	{
 		cheatPanel = new JPanel();
@@ -316,6 +323,8 @@ public class FrameJeu extends JFrame implements MouseListener
 		} else {
 			playSound("loose");
 		}
+		
+		Settings.saveScore(new Score(score, (int) ((System.currentTimeMillis()-timeAtStart)/1000L), dif));
 
 		FrameFin fin = new FrameFin(hasWin,score,(int) ((System.currentTimeMillis()-timeAtStart)/1000L),this);
 		fin.setVisible(true);
